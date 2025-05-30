@@ -1,0 +1,33 @@
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+  - stage: Build
+    displayName: Build Stage
+    jobs:
+    - job: Build
+      displayName: Build Jib
+      steps:
+        - bash: echo Contents in System Default Working Directory; ls -R $(System.DefaultWorkingDirectory)
+        - bash: echo Before copying Contents in Build Artifact Directory; ls -R $(Build.ArtifactStagingDirectory) 
+
+        - task: CopyFiles@2
+          inputs:
+            SourceFolder: '$(System.DefaultWorkingDirectory)/terraform-manifests'
+            Contents: '**'
+            TargetFolder: '$(build.artifactstagingdirectory)'
+            
+
+        - bash: echo After copying Contents in Build Artifact Directory; ls -R $(Build.ArtifactStagingDirectory) 
+
+        - task: PublishBuildArtifacts@1
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+            ArtifactName: 'terraform-manifestst'
+            publishLocation: 'Container'
+
+        
